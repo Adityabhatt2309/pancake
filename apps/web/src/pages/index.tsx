@@ -41,6 +41,7 @@ export const getStaticProps: GetStaticProps = async () => {
     }
   `
 
+
   const days30Ago = sub(new Date(), { days: 30 })
 
   const results = {
@@ -93,6 +94,7 @@ export const getStaticProps: GetStaticProps = async () => {
     }
   `
 
+
   if (process.env.BIT_QUERY_HEADER) {
     try {
       const result = await bitQueryServerClient.request(usersQuery, {
@@ -110,24 +112,25 @@ export const getStaticProps: GetStaticProps = async () => {
   }
 
   try {
-    const result = await infoServerClient.request(gql`
-      query tvl {
-        pancakeFactories(first: 1) {
-          totalLiquidityUSD
-        }
-      }
-    `)
-    const cake = await (await fetch('https://farms-api.pancakeswap.com/price/cake')).json()
-    const { totalLiquidityUSD } = result.pancakeFactories[0]
-    const cakeVaultV2 = getCakeVaultAddress()
-    const cakeContract = getCakeContract()
-    const totalCakeInVault = await cakeContract.balanceOf(cakeVaultV2)
-    results.tvl = parseFloat(formatEther(totalCakeInVault)) * cake.price + parseFloat(totalLiquidityUSD)
+    // const result = await infoServerClient.request(gql`
+    //   query tvl {
+    //     pancakeFactories(first: 1) {
+    //       totalLiquidityUSD
+    //     }
+    //   }
+    // `)
+    // const cake = await (await fetch('https://farms-api.pancakeswap.com/price/cake')).json()
+    // const { totalLiquidityUSD } = result.pancakeFactories[0]
+    // const cakeVaultV2 = getCakeVaultAddress()
+    // const cakeContract = getCakeContract()
+    // const totalCakeInVault = await cakeContract.balanceOf(cakeVaultV2)
+    // results.tvl = parseFloat(formatEther(totalCakeInVault)) * cake.price + parseFloat(totalLiquidityUSD)
   } catch (error) {
     if (process.env.NODE_ENV === 'production') {
       console.error('Error when fetching tvl stats', error)
     }
   }
+
 
   return {
     props: results,
