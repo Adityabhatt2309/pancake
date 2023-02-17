@@ -13,7 +13,6 @@ import {
   Text,
 } from '@pancakeswap/uikit'
 import { useAuth } from 'hooks/useAuth'
-
 import { useActiveChainId } from 'hooks/useNetwork'
 import { getBlockExploreLink } from 'utils'
 import useNativeCurrency from 'hooks/useNativeCurrency'

@@ -7,7 +7,7 @@ import { SWRConfig } from 'swr'
 import { getCakeVaultAddress } from 'utils/addressHelpers'
 import { getCakeContract } from 'utils/contractHelpers'
 import { getBlocksFromTimestamps } from 'utils/getBlocksFromTimestamps'
-import { bitQueryServerClient, infoServerClient } from 'utils/graphql'
+import { bitQueryServerClient, infoServerClient, infoClient } from 'utils/graphql'
 import Home from '../views/Home'
 
 const IndexPage = ({ totalTx30Days, addressCount30Days, tvl }) => {
@@ -41,6 +41,8 @@ export const getStaticProps: GetStaticProps = async () => {
     }
   `
 
+  console.log("totalTxQuery", totalTxQuery)
+
 
   const days30Ago = sub(new Date(), { days: 30 })
 
@@ -50,7 +52,7 @@ export const getStaticProps: GetStaticProps = async () => {
     tvl,
   }
 
-  if (process.env.SF_HEADER) {
+  // if (process.env.SF_HEADER) {
     try {
       const [days30AgoBlock] = await getBlocksFromTimestamps([getUnixTime(days30Ago)])
 
@@ -58,10 +60,10 @@ export const getStaticProps: GetStaticProps = async () => {
         throw new Error('No block found for 30 days ago')
       }
 
-      const totalTx = await infoServerClient.request(totalTxQuery, {
+      const totalTx = await infoClient.request(totalTxQuery, {
         id: FACTORY_ADDRESS,
       })
-      const totalTx30DaysAgo = await infoServerClient.request(totalTxQuery, {
+      const totalTx30DaysAgo = await infoClient.request(totalTxQuery, {
         block: {
           number: days30AgoBlock.number,
         },
@@ -82,7 +84,7 @@ export const getStaticProps: GetStaticProps = async () => {
         console.error('Error when fetching total tx count', error)
       }
     }
-  }
+  // }
 
   const usersQuery = gql`
     query userCount($since: ISO8601DateTime, $till: ISO8601DateTime) {
@@ -95,7 +97,7 @@ export const getStaticProps: GetStaticProps = async () => {
   `
 
 
-  if (process.env.BIT_QUERY_HEADER) {
+  // if (process.env.BIT_QUERY_HEADER) {
     try {
       const result = await bitQueryServerClient.request(usersQuery, {
         since: days30Ago.toISOString(),
@@ -109,7 +111,7 @@ export const getStaticProps: GetStaticProps = async () => {
         console.error('Error when fetching address count', error)
       }
     }
-  }
+  // }
 
   try {
     const result = await infoServerClient.request(gql`
